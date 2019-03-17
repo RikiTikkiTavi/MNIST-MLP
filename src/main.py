@@ -1,11 +1,6 @@
-import math
-
-import sklearn as sk
 import pandas as pd
 import numpy as np
-
-import matplotlib
-import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 from src.mlp import MLP
 
@@ -13,13 +8,9 @@ from src.mlp import MLP
 def main():
     df = pd.read_csv('./data/train.csv')
     mlp = MLP()
-
-    for index, row in df.iterrows():
-        vector = row.to_numpy()
-        # mlp.forward_propagation(vector[1:])
-        # mlp.backward_propagation(construct_y(vector[0]))
+    mlp.train(df, 1, 100)
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     np.random.seed(0)
     main()
