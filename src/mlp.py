@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import src.mlp_funcs as mlp_funcs
+from src.plot_controller import plot_costs
 from src.utils import construct_y
 from src.utils import create_gradient_accum
 from src.utils import log
@@ -57,7 +58,9 @@ class MLP:
         self.Y = None
         self.batch_size = None
 
-        self.learning_rate = 0.5
+        self.learning_rate = 1
+
+        self.costs_batch = []
 
     # -----------------
     # Getters / Setters
@@ -81,7 +84,7 @@ class MLP:
     def __set_W(self, index, W):
         self.weights[f'W_{index}'] = W
 
-    def __get_Z(self, index):
+    def __get_Z(self, index: object) -> object:
         return self.layers_z[f'Z_{index}']
 
     def __set_Z(self, index, Z):
@@ -206,9 +209,9 @@ class MLP:
         for p_type, params_dict in self.gradient_accumulator.items():
             for label, params_arr in params_dict.items():
                 if p_type == 'weights':
-                    self.weights[label] -= self.gradient_accumulator[p_type][label]
+                    self.weights[label] += self.gradient_accumulator[p_type][label]
                 elif p_type == 'biases':
-                    self.biases[label] -= self.gradient_accumulator[p_type][label]
+                    self.biases[label] += self.gradient_accumulator[p_type][label]
 
     def __handle_clear_gradient_accumulator(self):
         self.__set_gradient_accumulator(create_gradient_accum(self.layers_sizes))
@@ -216,6 +219,7 @@ class MLP:
     def __handle_prop_backward(self, Y):
         self.Y = Y
         cost = self.err_f(Y_hat=self.__get_A(3), Y=Y)
+        self.costs_batch.append(cost)
         log(f"Current cost computed: {cost}")
         log(f"Current Y set:\n {Y}")
         self.__update_error_signals()
@@ -245,21 +249,35 @@ class MLP:
     # External handlers
     # -----------------
 
-    def train(self, df_train, epochs, batch_size):
+    def train(self, X_train, Y_train, epochs, batch_size):
 
-        matrix_train = df_train.to_numpy()
+        matrix_train = np.concatenate((X_train, Y_train), axis=1)
+
+        print(f"Train matrix shape: {matrix_train.shape}")
+
         q_batches = matrix_train.shape[0] // batch_size
+
+        costs = []
 
         for e in range(epochs):
             print(f"--------------- EPOCH {e} ---------------")
             np.random.shuffle(matrix_train)
             batches = np.array(np.array_split(matrix_train, q_batches))
 
+            i = 0
             for batch in batches:
                 print('<BATCH>')
 
                 self.__handle_train_batch(batch)
 
-                print('</BATCH>\n\n')
+                costs.append(self.costs_batch)
+                self.costs_batch = []
+                i += 1
+                if i == 10:
+                    break
+
+                # print('</BATCH>\n\n')
 
             print(f"--------------- END OF EPOCH {e} ---------------")
+
+            plot_costs(costs)

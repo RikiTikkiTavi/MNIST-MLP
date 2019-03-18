@@ -7,8 +7,12 @@ from src.mlp import MLP
 
 def main():
     df = pd.read_csv('./data/train.csv')
+    X_train = (df.drop(['label'], axis=1)).to_numpy()
+    Y_Train = (df[['label']]).to_numpy()
+    print(Y_Train.shape)
+    print(X_train.shape)
     mlp = MLP()
-    mlp.train(df, 1, 100)
+    mlp.train(X_train, Y_Train, 1, 50)
 
 
 if __name__ == '__main__':
