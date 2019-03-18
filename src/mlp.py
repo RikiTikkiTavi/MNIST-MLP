@@ -58,7 +58,7 @@ class MLP:
         self.Y = None
         self.batch_size = None
 
-        self.learning_rate = 1
+        self.learning_rate = 6
 
         self.costs_batch = []
 
@@ -66,7 +66,7 @@ class MLP:
     # Getters / Setters
     # -----------------
 
-    def __get_A(self, index):
+    def __get_A(self, index: object) -> object:
         return self.layers_outputs[f'A_{index}']
 
     def __set_A(self, index, A):
@@ -110,20 +110,21 @@ class MLP:
     # -----------
 
     def __calc_gradient_step(self):
-        for p_type, params_dict in self.gradient_accumulator.items():
-            for label, params_arr in params_dict:
-                self.gradient_accumulator[p_type][label] /= self.batch_size
-                self.gradient_accumulator[p_type][label] *= self.learning_rate
+        gradient_accumulator = self.gradient_accumulator
+        for p_type, params_dict in gradient_accumulator.items():
+            for label, params_arr in params_dict.items():
+                gradient_accumulator[p_type][label] = self.learning_rate * gradient_accumulator[p_type][
+                    label] / self.batch_size
+        return gradient_accumulator
 
-    # noinspection PyTypeChecker
     def __calculate_Z(self, l_index):
-        return np.matmul(self.__get_W(l_index), self.__get_A(l_index - 1)) - self.__get_B(l_index)
+        return np.matmul(self.__get_W(l_index), self.__get_A(l_index - 1)) + self.__get_B(l_index)
 
     def __calculate_A(self, Z):
         return self.act_f(Z)
 
     def __calc_dC_dw(self, l_i, k, j):
-        return self.__get_ES(l_i)[k] * self.__get_A(l_i - 1)[j]
+        return self.__get_ES(l_i)[k] * (self.__get_A(l_i - 1))[j]
 
     def __calc_dC_db(self, l_i, k):
         return self.__get_ES(l_i)[k]
@@ -184,14 +185,14 @@ class MLP:
         self.__handle_update_error_signals_layer(1, 16)
 
     def __handle_add_dC_dw_to_accum(self, l_i):
-        W = self.__get_W(l_i)  # To get an array of correct shape
+        W = np.array(self.__get_W(l_i), copy=True)  # To get an array of correct shape
         for k, row in enumerate(W):
             for j, weight in enumerate(row):
                 W[k][j] = self.__calc_dC_dw(l_i, k, j)
         self.__add_W_to_gradient_accum(l_i, W)
 
     def __handle_add_dC_db_to_accum(self, l_i):
-        B = self.__get_B(l_i)  # To get an array of correct shape
+        B = np.array(self.__get_B(l_i), copy=True)  # To get an array of correct shape
         for k, b in enumerate(B):
             B[k] = self.__calc_dC_db(l_i, k)
         self.__add_B_to_gradient_accum(l_i, B)
@@ -209,9 +210,9 @@ class MLP:
         for p_type, params_dict in self.gradient_accumulator.items():
             for label, params_arr in params_dict.items():
                 if p_type == 'weights':
-                    self.weights[label] += self.gradient_accumulator[p_type][label]
+                    self.weights[label] -= self.gradient_accumulator[p_type][label]
                 elif p_type == 'biases':
-                    self.biases[label] += self.gradient_accumulator[p_type][label]
+                    self.biases[label] -= self.gradient_accumulator[p_type][label]
 
     def __handle_clear_gradient_accumulator(self):
         self.__set_gradient_accumulator(create_gradient_accum(self.layers_sizes))
@@ -235,13 +236,14 @@ class MLP:
 
     def __handle_single_vector(self, vector):
         log(f"Processing vector:\n {vector}")
-        self.__handle_prop_forward(vector[1:])
+        self.__handle_prop_forward(vector[:-1])
         log(f"Forward prop completed: output:\n {self.layers_outputs['A_3']}")
-        self.__handle_prop_backward(construct_y(vector[0]))
+        self.__handle_prop_backward(construct_y(vector[-1]))
 
     def __handle_train_batch(self, batch):
         self.batch_size = batch.shape[0]
-        np.apply_along_axis(self.__handle_single_vector, 1, batch)
+        np.apply_along_axis(func1d=self.__handle_single_vector, axis=1, arr=batch)
+        self.__set_gradient_accumulator(self.__calc_gradient_step())
         self.__handle_apply_gradient_accumulator()
         self.__handle_clear_gradient_accumulator()
 
@@ -257,27 +259,29 @@ class MLP:
 
         q_batches = matrix_train.shape[0] // batch_size
 
-        costs = []
-
+        costs = np.array([])
         for e in range(epochs):
             print(f"--------------- EPOCH {e} ---------------")
             np.random.shuffle(matrix_train)
             batches = np.array(np.array_split(matrix_train, q_batches))
 
-            i = 0
             for batch in batches:
                 print('<BATCH>')
 
                 self.__handle_train_batch(batch)
 
-                costs.append(self.costs_batch)
+                costs = np.append(costs, self.costs_batch)
                 self.costs_batch = []
-                i += 1
-                if i == 10:
-                    break
 
-                # print('</BATCH>\n\n')
+                print('</BATCH>\n')
 
             print(f"--------------- END OF EPOCH {e} ---------------")
 
-            plot_costs(costs)
+        plot_costs(costs)
+
+    def predict(self, X):
+        Y = np.array([])
+        for x in X:
+            self.__handle_prop_forward(x)
+            Y = np.append(Y, np.argmax(self.__get_A(3)))
+        return Y

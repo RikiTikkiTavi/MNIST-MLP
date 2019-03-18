@@ -7,12 +7,20 @@ from src.mlp import MLP
 
 def main():
     df = pd.read_csv('./data/train.csv')
-    X_train = (df.drop(['label'], axis=1)).to_numpy()
-    Y_Train = (df[['label']]).to_numpy()
-    print(Y_Train.shape)
-    print(X_train.shape)
+    df = df.head(n=2000)
+    X_train = (df.drop(['label'], axis=1))
+    Y_Train = (df[['label']])
+    X_train, X_test, y_train, y_test = train_test_split(X_train, Y_Train, test_size=0.33, random_state=42)
     mlp = MLP()
-    mlp.train(X_train, Y_Train, 1, 50)
+    mlp.train(X_train.to_numpy(), y_train.to_numpy(), 10, 100)
+    result = mlp.predict(X_test.to_numpy())
+    y_test = y_test.to_numpy()
+    print(f"Result\n: {result}")
+    print(f"Result shape: {result.shape}")
+    print(f"Correct result\n: {y_test}")
+    print(f"Correct result shape: {y_test.shape}")
+
+    print(np.sum(result == y_test)/result.shape[0])
 
 
 if __name__ == '__main__':

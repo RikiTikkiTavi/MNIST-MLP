@@ -9,8 +9,7 @@ class plot_controller:
 
 
 def plot_costs(costs):
-    costs_flat = np.array(costs).reshape(-1)
-    fig, ax = plt.subplots(figsize=(5, 5))
+    fig, ax = plt.subplots(figsize=(7, 7))
     ax.set_title('Costs on sample')
-    ax.plot(costs_flat)
+    ax.plot(costs)
     fig.show()

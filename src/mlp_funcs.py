@@ -10,7 +10,7 @@ def d_sigmoid_dz(z):
 
 
 def mse(Y_hat, Y):
-    return np.sum((np.square(Y - Y_hat)))
+    return np.sum((np.square(Y_hat - Y)))
 
 
 def d_mse_da(a, y):
