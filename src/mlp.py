@@ -50,15 +50,15 @@ class MLP:
 
         self.gradient_accumulator = create_gradient_accum(self.layers_sizes)
 
-        self.act_f = mlp_funcs.sigmoid
-        self.d_act_f_dz = mlp_funcs.d_sigmoid_dz
+        self.act_f = mlp_funcs.relu
+        self.d_act_f_dz = mlp_funcs.d_relu_dz
         self.err_f = mlp_funcs.mse
         self.d_err_f_da = mlp_funcs.d_mse_da
 
         self.Y = None
         self.batch_size = None
 
-        self.learning_rate = 6
+        self.learning_rate = 0.3
 
         self.costs_batch = []
 
@@ -266,14 +266,11 @@ class MLP:
             batches = np.array(np.array_split(matrix_train, q_batches))
 
             for batch in batches:
-                print('<BATCH>')
 
                 self.__handle_train_batch(batch)
 
                 costs = np.append(costs, self.costs_batch)
                 self.costs_batch = []
-
-                print('</BATCH>\n')
 
             print(f"--------------- END OF EPOCH {e} ---------------")
 
