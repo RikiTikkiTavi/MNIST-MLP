@@ -1,14 +1,9 @@
-import math
-import sklearn as skl
-import pandas as pd
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import src.mlp_funcs as mlp_funcs
-from src.plot_controller import plot_costs
-from src.utils import construct_y
-from src.utils import create_gradient_accum
-from src.utils import log
+import src.self_realisation.mlp_funcs as mlp_funcs
+from src.self_realisation.plot_controller import plot_costs
+from src.self_realisation.utils import construct_y
+from src.self_realisation.utils import create_gradient_accum
+from src.self_realisation.utils import log
 
 
 class MLP:
