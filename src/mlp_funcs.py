@@ -10,9 +10,23 @@ def relu(x):
 
 
 def d_relu_dz(z):
-    z[z <= 0] = 0
-    z[z > 0] = 1
-    return z
+    return (z > 0) * 1
+
+
+def leaky_relu(Z):
+    return np.maximum(0.1 * Z, Z)
+
+
+def d_leaky_relu_dz(z):
+    return 1 if z >= 0 else 0.01
+
+
+def tanh(Z):
+    return np.tanh(Z)
+
+
+def d_tanh_dz(z):
+    return 1 - (np.square(np.tanh(z)))
 
 
 def d_sigmoid_dz(z):
@@ -24,4 +38,4 @@ def mse(Y_hat, Y):
 
 
 def d_mse_da(a, y):
-    return 2 * (a - y)
+    return 2*(a - y)

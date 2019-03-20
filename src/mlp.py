@@ -50,15 +50,15 @@ class MLP:
 
         self.gradient_accumulator = create_gradient_accum(self.layers_sizes)
 
-        self.act_f = mlp_funcs.relu
-        self.d_act_f_dz = mlp_funcs.d_relu_dz
+        self.act_f = mlp_funcs.sigmoid
+        self.d_act_f_dz = mlp_funcs.d_sigmoid_dz
         self.err_f = mlp_funcs.mse
         self.d_err_f_da = mlp_funcs.d_mse_da
 
         self.Y = None
         self.batch_size = None
 
-        self.learning_rate = 0.3
+        self.learning_rate = 2.7
 
         self.costs_batch = []
 

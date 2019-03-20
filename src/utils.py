@@ -5,6 +5,7 @@ def construct_y(y):
     Y = np.array([1 if y == i else 0 for i in range(0, 10)])
     return Y
 
+
 def create_gradient_accum(layers_sizes):
     layer_0_size, layer_1_size, layer_2_size, layer_3_size = layers_sizes
     return {
