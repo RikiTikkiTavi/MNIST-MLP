@@ -30,9 +30,8 @@ y_train = encode_y(y_train)
 y_test = encode_y(y_test)
 
 model = keras.Sequential([
-    keras.layers.Dense(units=32, input_shape=(784,), activation=tf.nn.leaky_relu),
-    keras.layers.Dense(units=16, activation=tf.nn.tanh),
-    keras.layers.Dense(units=16, activation=tf.nn.leaky_relu),
+    keras.layers.Dense(units=397, input_shape=(784,), activation=tf.nn.tanh),
+    keras.layers.Dense(units=397, activation=tf.nn.relu),
     keras.layers.Dense(units=10, activation=tf.nn.tanh)
 ])
 
