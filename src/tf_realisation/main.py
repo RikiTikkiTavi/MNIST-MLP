@@ -42,7 +42,7 @@ def mnist_model(x_train, y_train, x_test, y_test, params):
     history = model.fit(x=x_train,
                         y=y_train,
                         validation_data=(x_test, y_test),
-                        epochs=25,
+                        epochs=100,
                         shuffle=True,
                         use_multiprocessing=True,
                         batch_size=params['batch_size'],
