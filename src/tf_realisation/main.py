@@ -72,10 +72,17 @@ def main():
     y_train = encode_y(y_train)
     y_test = encode_y(y_test)
 
-    params = {
+
+    params_dict_broad = {
         'lr': [0.001, 0.01, 0.1],
         'decay': [0.00001, 0.0001, 0.001],
         'momentum': [0.9, 0.945, 0.99],
+        'batch_size': [100]
+    }
+    params = {
+        'lr': [0.009, 0.01, 0.011],
+        'decay': [0.00008, 0.0001, 0.00012],
+        'momentum': [0.945],
         'batch_size': [100]
     }
 
