@@ -6,7 +6,7 @@ Was created MLP with 2 hidden layers. Error metric: Mean Squared Error. Optimisa
 Could be found at https://github.com/RikiTikkiTavi/MNIST-MLP/tree/master/src/self_realisation
 
 
-### Using keras tensorflow:
+### Using keras:
 Was created MLP with 2 hidden layers. Error metric: Mean Squared Error. Optimisation: SGD with decay, momentum and Nesterov.
 Parameters where tuned using GridSearch implementation from Talos library.
 Accuracy 95.69% is achieved on test data.
