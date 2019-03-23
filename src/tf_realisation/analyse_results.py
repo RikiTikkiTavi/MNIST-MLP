@@ -1,8 +1,17 @@
-import talos as ta
 import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 
-r = ta.Reporting('mlp_mnist_hyperparams.csv')
 
-print(r.data)
+def get_best(filename):
+    data = pd.read_csv(filename)
+    best_params = data.loc[data['val_categorical_accuracy'].idxmax(), :]
+    print(best_params.to_dict())
 
-r.plot_line(metric="categorical_accuracy")
+
+def main():
+    get_best('p1.csv')
+    get_best('p2.csv')
+
+
+main()
